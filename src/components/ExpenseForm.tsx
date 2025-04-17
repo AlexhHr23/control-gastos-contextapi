@@ -50,6 +50,15 @@ export const ExpenseForm = () => {
 
         // Acción: agregar un nuevo gasto
         dispatch({type: 'add-expense', payload: {expense}})
+
+        //Reiniciar el state
+        setExpense({
+            amount: 0,
+            expenseName: '',
+            category: '',
+            date: new Date()
+        })
+
     }
 
   return (
