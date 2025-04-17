@@ -1,8 +1,10 @@
 import { Expense } from "../types"
+import { LeadingActions, SwipeableList, SwipeableListItem, SwipeAction, TrailingActions } from 'react-swipeable-list'
 import { formateDate } from "../helpers"
 import { AmountDisplay } from "./AmountDisplay"
 import { useMemo } from "react"
 import { categories } from "../data/categories"
+import "react-swipeable-list/dist/styles.css"
 
 type ExpenseDetailProps = {
   expense: Expense
@@ -12,7 +14,36 @@ export const ExpenseDetail = ({expense} : ExpenseDetailProps) => {
 
   const categoryInfo = useMemo(() => categories.filter(cat => cat.id === expense.category)[0], [expense])
 
+  const leadingActions = () => (
+    <LeadingActions>
+      <SwipeAction 
+        onClick={() => {}}
+      >
+        Actualizar
+      </SwipeAction>
+    </LeadingActions>
+  )
+
+  const trailingActions = () => (
+    <TrailingActions>
+      <SwipeAction 
+        onClick={() => {}}
+        destructive={true}
+      >
+        Eliminar
+      </SwipeAction>
+    </TrailingActions>
+  )
+
+
+
   return (
+    <SwipeableList>
+      <SwipeableListItem
+        maxSwipe={30}
+        leadingActions={leadingActions()}
+        trailingActions={trailingActions()}
+      >
     <div className="bg-white shadow-lg p-10 w-full border-b border-gray-200 flex gap-5 items-center">
       <div>
         <img
@@ -32,7 +63,8 @@ export const ExpenseDetail = ({expense} : ExpenseDetailProps) => {
         amount={expense.amount}
       />
     </div>
-
+    </SwipeableListItem>
+    </SwipeableList>
    
   )
 }
