@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import type { DrafExpense, Value } from "../types";
 import { Select } from "@headlessui/react"
 import { categories } from "../data/categories"
@@ -20,7 +20,7 @@ export const ExpenseForm = () => {
     })
 
     const [error, setError] = useState('')
-    const {dispatch} = useBudget()
+    const {dispatch, state} = useBudget()
 
     const hadleChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
         const {name, value } = e.target
@@ -30,6 +30,13 @@ export const ExpenseForm = () => {
             [name]: isAmountField ? +value : value
         })
     }
+
+    useEffect(() => {
+        if(state.editingId) {
+            const editingExpense = state.expenses.filter(currenteExpense => currenteExpense.id === state.editingId)[0]
+            setExpense(editingExpense)
+        }
+    }, [state.editingId])
 
 
     const hadleChangeDate = (value: Value) => {
@@ -48,8 +55,14 @@ export const ExpenseForm = () => {
             return
         }
 
-        // Acción: agregar un nuevo gasto
-        dispatch({type: 'add-expense', payload: {expense}})
+        // Acción: agregar un nuevo gasto o actualiza
+        if(state.editingId) {
+            dispatch({type: 'update-expense', payload: {expense: {id: state.editingId, ...expense}}})
+        }else {
+            dispatch({type: 'add-expense', payload: {expense}})
+        }
+       
+
 
         //Reiniciar el state
         setExpense({
