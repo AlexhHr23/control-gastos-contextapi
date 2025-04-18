@@ -20,7 +20,8 @@ export const ExpenseForm = () => {
     })
 
     const [error, setError] = useState('')
-    const {dispatch, state} = useBudget()
+    const [previousAmount, setPreviousAmount] =  useState(0)
+    const {dispatch, state, remainingBudget} = useBudget()
 
     const hadleChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
         const {name, value } = e.target
@@ -35,6 +36,7 @@ export const ExpenseForm = () => {
         if(state.editingId) {
             const editingExpense = state.expenses.filter(currenteExpense => currenteExpense.id === state.editingId)[0]
             setExpense(editingExpense)
+            setPreviousAmount(editingExpense.amount)
         }
     }, [state.editingId])
 
@@ -55,15 +57,19 @@ export const ExpenseForm = () => {
             return
         }
 
+        //Validar que no pase del limite
+        if((expense.amount - previousAmount)> remainingBudget) {
+            setError('Ese gasto se sale del presupuesto')
+            return
+        }
+
         // Acción: agregar un nuevo gasto o actualiza
         if(state.editingId) {
             dispatch({type: 'update-expense', payload: {expense: {id: state.editingId, ...expense}}})
         }else {
             dispatch({type: 'add-expense', payload: {expense}})
         }
-       
-
-
+    
         //Reiniciar el state
         setExpense({
             amount: 0,
@@ -71,6 +77,8 @@ export const ExpenseForm = () => {
             category: '',
             date: new Date()
         })
+
+        setPreviousAmount(0)
 
     }
 
